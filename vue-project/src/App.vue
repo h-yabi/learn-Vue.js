@@ -5,53 +5,29 @@
     <button @click="myAnimation = 'fade'">Fade</button>
 
     <button @click="show = !show">切り替え</button>
-    <!-- <transition
-      name="fade"
-      type=""
-      enter-class=""
-      enter-active-class="animate__animated animate__bounce"
-      enter-to-class=""
-      leave-class=""
-      leave-active-class=""
-      leave-to-class=""
-      appear
-    >
-      <p v-if="show">Hello</p>
-    </transition> -->
+
     <transition
       :name="myAnimation"
     >
       <p v-if="show">bye</p>
     </transition>
 
-    <transition name="fade" mode="out-in">
-      <p
-        v-if="show"
-        key="bye"
-      >さよなら</p>
+    <br>
+    <br>
 
-      <p
-        v-else
-        key="hello"
-      >こんにちは</p>
-    </transition>
 
-    <transition
-      name="fade"
-      @before-enter="beforeEnter"
-      @enter="enter"
-      @after-enter="afterEnter"
-      @enter-cancelled="enterCancelled"
-      @before-leave="beforeLeave"
-      @leave="leave"
-      @after-leave="afterLeave"
-      @leave-cancelled="leaveCancelled"
-    >
-      <div
-        class="circle"
-        v-if="show"
-      ></div>
-    </transition>
+    <button @click="add">追加</button>
+    <ul style="width: 200px; margin: auto;">
+      <transition-group name="fade" tag="div">
+        <li
+          style="cursor: pointer;"
+          v-for="(number, index) in numbers"
+          @click="remove(index)"
+          :key="number"
+        >{{ number }}</li>
+      </transition-group>
+    </ul>
+
 
 
   </div>
@@ -63,58 +39,30 @@ export default {
   data() {
     return {
       show: true,
-      myAnimation: 'slide'
+      myAnimation: 'slide',
+      numbers: [0, 1, 2],
+      nextnumber: 3,
     }
   },
   methods: {
-    beforeEnter(el) {
-      // 現れる前
-      el.style.transform = 'scale(0)';
+    randomIndex() {
+      return Math.floor(Math.random() * this.numbers.length);
     },
-    enter(el, done) {
-      // 現れる時
-      let scale = 0;
-      const interval = setInterval(() => {
-        el.style.transform = `scale(${scale})`;
-        scale += 0.1;
-        if(scale > 1) {
-          clearInterval(interval);
-          done();
-        }
-      }, 30);
+    add() {
+      this.numbers.splice(this.randomIndex(), 0, this.nextnumber);
+      this.nextnumber += 1;
     },
-    // afterEnter(el) {
-    //   // 現れた後
-    // },
-    // enterCancelled(el) {
-    //   // 現れるアニメーションがキャンセルされた時
-    // },
-    // beforeLeave(el) {
-    //   // 消える前
-    // },
-    leave(el, done) {
-      // 消える時
-      let scale = 1;
-      const interval = setInterval(() => {
-        el.style.transform = `scale(${scale})`;
-        scale -= 0.1;
-        if(scale < 0) {
-          clearInterval(interval);
-          done();
-        }
-      }, 30);
-    },
-    // afterLeave(el) {
-    //   // 消えた後
-    // },
-    // leaveCancelled(el) {
-    //   // 消えるアニメーションがキャンセルされた時
-    // }
+    remove(index) {
+      this.numbers.splice(index, 1);
+    }
   },
 }
 </script>
 
 <style scoped>
+.fade-move {
+  transition: transform 1s;
+}
 .fade-enter {
   /* 現れる時の最初の状態 */
   opacity: 0;
@@ -137,6 +85,8 @@ export default {
 .fade-leave-active {
   /* 消える時のトランジションの状態 */
   transition: opacity .5s;
+  position: absolute;
+  width: 200px;
 }
 .fade-leave-to {
   /* 消える時の最後の状態 */
